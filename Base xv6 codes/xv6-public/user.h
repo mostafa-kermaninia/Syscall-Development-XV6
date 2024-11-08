@@ -25,6 +25,8 @@ int sleep(int);
 int uptime(void);
 int create_palindrome(int num);
 
+int move_file(const char*, const char*);
+
 // ulib.c
 int stat(const char *, struct stat *);
 char *strcpy(char *, const char *);
