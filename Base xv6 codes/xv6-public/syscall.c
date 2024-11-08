@@ -104,8 +104,8 @@ extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
 extern int sys_create_palindrome(void);
-
 extern int sys_move_file(void);
+extern int sys_sort_syscalls(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -131,6 +131,7 @@ static int (*syscalls[])(void) = {
 [SYS_close]   sys_close,
 [SYS_create_palindrome] sys_create_palindrome,
 [SYS_move_file] sys_move_file,
+[SYS_sort_syscalls] sys_sort_syscalls,
 };
 
 void
@@ -142,6 +143,9 @@ syscall(void)
   num = curproc->tf->eax;
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
     curproc->tf->eax = syscalls[num]();
+
+    // Track the system call
+    curproc->syscall[num - 1]++;
   } else {
     cprintf("%d %s: unknown sys call %d\n",
             curproc->pid, curproc->name, num);

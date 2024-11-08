@@ -100,3 +100,11 @@ int sys_create_palindrome(void)
 
   return 0;
 }
+
+int sys_sort_syscalls(void) {
+  int pid;
+
+  if (argint(0, &pid) < 0)
+    return -1;
+  return sort_syscalls(pid);
+}

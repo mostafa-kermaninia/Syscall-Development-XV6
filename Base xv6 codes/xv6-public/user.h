@@ -23,9 +23,9 @@ int getpid(void);
 char *sbrk(int);
 int sleep(int);
 int uptime(void);
-void create_palindrome(void);
-
+void create_palindrome(int);
 int move_file(const char *, const char *);
+int sort_syscalls(int);
 
 // ulib.c
 int stat(const char *, struct stat *);
