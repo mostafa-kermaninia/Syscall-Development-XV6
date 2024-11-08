@@ -22,3 +22,4 @@
 #define SYS_close  21
 #define SYS_create_palindrome 22
 #define SYS_move_file 23
+#define SYS_sort_syscalls 24
