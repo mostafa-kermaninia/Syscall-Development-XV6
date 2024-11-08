@@ -87,8 +87,9 @@ int sys_uptime(void)
 int sys_create_palindrome(void)
 {
   int num;
-  if (argint(0, &num) < 0)
-    return -1;
+  struct proc *p = myproc();
+  num = p->tf->ebx;
+
   int ans = num;
   while (num != 0)
   {
