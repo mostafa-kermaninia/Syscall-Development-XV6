@@ -113,7 +113,7 @@ found:
   p->context->eip = (uint)forkret;
 
   // Initialize number of each system call
-  memset(p->syscall, 0, sizeof(p->syscall));
+  memset(p->syscalls, 0, sizeof(p->syscalls));
 
   return p;
 }
@@ -548,8 +548,8 @@ sort_syscalls(int pid)
     if(p->pid == pid){
       cprintf("System calls for process %d:\n", pid);
       for(i = 0; i < MAX_SYSCALLS; i++)
-        if(p->syscall[i] > 0)
-          cprintf("Syscall #%d: %d\n", i + 1, p->syscall[i]);
+        if(p->syscalls[i] > 0)
+          cprintf("Syscall #%d: %d\n", i + 1, p->syscalls[i]);
       release(&ptable.lock);
       return 0;
     }

@@ -145,7 +145,7 @@ syscall(void)
     curproc->tf->eax = syscalls[num]();
 
     // Track the system call
-    curproc->syscall[num - 1]++;
+    curproc->syscalls[num - 1]++;
   } else {
     cprintf("%d %s: unknown sys call %d\n",
             curproc->pid, curproc->name, num);

@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
 
   int pid = atoi(argv[1]);
 
-//   printf(1, "Current process id: %d\n", getpid());
+  // printf(1, "Current process id: %d\n", getpid());
 
   if (sort_syscalls(pid) < 0) {
     printf(2, "Error: Could not print system calls for pid %d\n", pid);
