@@ -442,3 +442,56 @@ sys_pipe(void)
   fd[1] = fd1;
   return 0;
 }
+
+int sys_move_file(void)
+{
+  struct inode *ip, *dp_new, *dp_old;
+  struct dirent de;
+  char name[DIRSIZ], *src_file, *dest_dir;
+  uint off;
+
+  // Fetch arguments from user space
+  if (argstr(0, &src_file) < 0 || argstr(1, &dest_dir) < 0)
+    return -1;
+
+  begin_op();
+  // Look up source directory
+  if ((dp_old = nameiparent(src_file, name)) == 0){
+    end_op();
+    return -1;
+  }
+
+  // Look up source file
+  if((ip = dirlookup(dp_old, name, &off)) == 0){
+    end_op();
+    return -1;
+  }
+
+  // Look up destination directory
+  if((dp_new = namei(dest_dir)) == 0){
+    end_op();
+    return -1;
+  }
+
+  // Link the file in the destination directory
+  ilock(dp_new);
+  if(dp_new->dev != ip->dev || dirlink(dp_new, name, ip->inum) < 0){
+    iunlockput(dp_new);
+    end_op();
+    return -1;
+  }
+  iunlockput(dp_new);
+
+  // Unlink the file from its original location
+  memset(&de, 0, sizeof(de));
+  ilock(dp_old);
+  if(writei(dp_old, (char*)&de, off, sizeof(de)) != sizeof(de)){
+    iunlockput(dp_old);
+    return -1;
+  }
+  iunlockput(dp_old);
+
+  end_op();
+
+  return 0;
+}
