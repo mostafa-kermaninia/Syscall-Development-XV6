@@ -1,13 +1,13 @@
 00000000 grep.c
 00000000 ulib.c
 00000000 printf.c
-00000680 printint
-00000af0 digits.0
+00000690 printint
+00000b00 digits.0
 00000000 umalloc.c
 000012a0 freep
 000012a4 base
 00000370 strcpy
-00000730 printf
+00000740 printf
 00000590 memmove
 000000c0 matchhere
 0000060b mknod
@@ -17,7 +17,7 @@
 00000663 create_palindrome
 00000673 sort_syscalls
 000001d0 grep
-00000960 malloc
+00000970 malloc
 00000653 sleep
 000005d3 pipe
 000005e3 write
@@ -31,7 +31,8 @@
 000005bb fork
 0000064b sbrk
 0000065b uptime
-00000e90 __bss_start
+0000067b list_all_processes
+00000ea0 __bss_start
 00000430 memset
 00000000 main
 00000310 matchstar
@@ -39,7 +40,7 @@
 0000063b dup
 00000ea0 buf
 00000500 stat
-00000e90 _edata
+00000ea0 _edata
 000012ac _end
 00000170 match
 00000623 link
@@ -50,4 +51,4 @@
 00000450 strchr
 0000062b mkdir
 000005eb close
-000008d0 free
+000008e0 free

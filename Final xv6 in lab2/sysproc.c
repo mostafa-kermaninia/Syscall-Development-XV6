@@ -89,15 +89,7 @@ int sys_create_palindrome(void)
   int num;
   struct proc *p = myproc();
   num = p->tf->ebx;
-
-  int ans = num;
-  while (num != 0)
-  {
-    ans = ans * 10 + num % 10;
-    num /= 10;
-  }
-  cprintf("%d\n", ans);
-
+  create_palindrome(num);
   return 0;
 }
 
@@ -107,4 +99,8 @@ int sys_sort_syscalls(void) {
   if (argint(0, &pid) < 0)
     return -1;
   return sort_syscalls(pid);
+}
+
+int sys_list_all_processes(void){
+  return list_all_processes();
 }

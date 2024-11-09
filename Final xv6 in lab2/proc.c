@@ -536,6 +536,17 @@ procdump(void)
   }
 }
 
+void
+create_palindrome(int num){
+  int ans = num;
+  while (num != 0)
+  {
+    ans = ans * 10 + num % 10;
+    num /= 10;
+  }
+  cprintf("%d\n", ans);
+}
+
 int
 sort_syscalls(int pid)
 {
@@ -556,4 +567,25 @@ sort_syscalls(int pid)
   }
   release(&ptable.lock);
   return -1;
+}
+
+int
+list_all_processes(){
+  int i, p_count = 0;
+  struct proc *p;
+
+  acquire(&ptable.lock);
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if (p->state == RUNNING){
+        p_count++;
+        int num_syscalls = 0;
+        for(i = 0; i < MAX_SYSCALLS; i++)
+          // num_syscalls += p->syscalls[i];
+          if(p->syscalls[i] > 0)
+            num_syscalls += p->syscalls[i];
+        cprintf("Process %d with %d Syscalls\n", p->pid, num_syscalls);
+      }
+    }
+  release(&ptable.lock);
+  return (p_count == 0) ? -1 : 0;
 }

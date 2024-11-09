@@ -184,6 +184,7 @@ UPROGS=\
 	_palindrome\
 	_mv\
 	_sort_syscalls\
+	_list_all_processes\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
@@ -253,7 +254,7 @@ qemu-nox-gdb: fs.img xv6.img .gdbinit
 EXTRA=\
 	mkfs.c ulib.c user.h cat.c echo.c forktest.c grep.c kill.c\
 	ln.c ls.c mkdir.c rm.c stressfs.c usertests.c wc.c zombie.c\
-	printf.c umalloc.c palindrome.c mv.c sort_syscalls.c\
+	printf.c umalloc.c palindrome.c mv.c sort_syscalls.c list_all_processes.c\
 	README dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
 	.gdbinit.tmpl gdbutil\
 

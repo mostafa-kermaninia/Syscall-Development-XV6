@@ -106,6 +106,7 @@ extern int sys_uptime(void);
 extern int sys_create_palindrome(void);
 extern int sys_move_file(void);
 extern int sys_sort_syscalls(void);
+extern int sys_list_all_processes(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -132,6 +133,8 @@ static int (*syscalls[])(void) = {
 [SYS_create_palindrome] sys_create_palindrome,
 [SYS_move_file] sys_move_file,
 [SYS_sort_syscalls] sys_sort_syscalls,
+
+[SYS_list_all_processes] sys_list_all_processes,
 };
 
 void

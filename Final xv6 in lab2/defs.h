@@ -120,7 +120,9 @@ void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
 void            yield(void);
+void            create_palindrome(int);
 int             sort_syscalls(int);
+int             list_all_processes(void);
 
 // swtch.S
 void            swtch(struct context**, struct context*);
