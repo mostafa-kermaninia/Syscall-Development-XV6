@@ -487,6 +487,7 @@ int sys_move_file(void)
   ilock(dp_old);
   if(writei(dp_old, (char*)&de, off, sizeof(de)) != sizeof(de)){
     iunlockput(dp_old);
+    end_op();
     return -1;
   }
   iunlockput(dp_old);
