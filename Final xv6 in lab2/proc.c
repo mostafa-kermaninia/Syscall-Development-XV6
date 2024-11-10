@@ -601,13 +601,15 @@ get_most_invoked_syscall(int pid){
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     if(p->pid == pid){
       for(int i =0; i< p->syscalls_count;i++){
-        if(syscall_invokes < p->syscall_invokes[i]){
-            syscall_invokes = p->syscall_invokes[i];
-            syscall_name = p->syscall_name[i];
+        if(syscall_invokes <= p->syscall_invokes[p->syscall_num[i]]){
+
+            syscall_invokes = p->syscall_invokes[p->syscall_num[i]];
+            syscall_name = p->syscall_name[i];;
         }
       }
       if (syscall_invokes > 0){
-        cprintf("Most invoked syscall for process %d is %s with %d invokes\n", p->pid, syscall_name, syscall_invokes);
+        cprintf("Most invoked syscall for process %d is %s with %d invokes\n", p->pid, syscall_name,
+               syscall_invokes);
         release(&ptable.lock);
         return 0;
       }
