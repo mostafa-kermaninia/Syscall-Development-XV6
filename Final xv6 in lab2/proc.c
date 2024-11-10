@@ -596,6 +596,7 @@ int
 get_most_invoked_syscall(int pid){
   char *syscall_name = "";
   int syscall_invokes = 0;
+  int syscall_num = 0;
   struct proc *p;
   acquire(&ptable.lock);
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
@@ -604,14 +605,15 @@ get_most_invoked_syscall(int pid){
         if(syscall_invokes <= p->syscall_invokes[p->syscall_num[i]]){
 
             syscall_invokes = p->syscall_invokes[p->syscall_num[i]];
-            syscall_name = p->syscall_name[i];;
+            syscall_name = p->syscall_name[i];
+            syscall_num = p->syscall_num[i];
         }
       }
       if (syscall_invokes > 0){
         cprintf("Most invoked syscall for process %d is %s with %d invokes\n", p->pid, syscall_name,
                syscall_invokes);
         release(&ptable.lock);
-        return 0;
+        return syscall_num;
       }
     }
   }
