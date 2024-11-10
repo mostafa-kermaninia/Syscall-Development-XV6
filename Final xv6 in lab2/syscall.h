@@ -23,5 +23,5 @@
 #define SYS_create_palindrome 22
 #define SYS_move_file 23
 #define SYS_sort_syscalls 24
-
+#define SYS_get_most_invoked_syscall 25
 #define SYS_list_all_processes 26

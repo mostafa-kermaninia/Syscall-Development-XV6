@@ -52,6 +52,7 @@ struct proc {
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
   int syscalls_count;                 // count number of system calls
+  int syscall_invokes[MAX_SYSCALLS];   // Array to count each system call
   int syscall_num[MAX_SYSCALLS];      // system calls number
   char *syscall_name[MAX_SYSCALLS];   // system calls name
 };

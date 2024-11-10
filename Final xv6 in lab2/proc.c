@@ -112,6 +112,9 @@ found:
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
 
+  // Initialize number of each system call
+  memset(p->syscall_invokes, 0, sizeof(p->syscall_invokes));
+
   // Initialize number of system calls
   p->syscalls_count = 0;
 
@@ -583,6 +586,32 @@ sort_syscalls(int pid)
 
       release(&ptable.lock);
       return 0;
+    }
+  }
+  release(&ptable.lock);
+  return -1;
+}
+
+int 
+get_most_invoked_syscall(int pid){
+  char *syscall_name = "";
+  int syscall_invokes = 0;
+  struct proc *p;
+  acquire(&ptable.lock);
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->pid == pid){
+      cprintf("mew\n");
+      for(int i =0; i< p->syscalls_count;i++){
+        if(syscall_invokes < p->syscall_invokes[i]){
+            syscall_invokes = p->syscall_invokes[i];
+            syscall_name = p->syscall_name[i];
+        }
+      }
+      if (syscall_invokes > 0){
+        cprintf("Most invoked syscall for process %d is %s with %d invokes\n", p->pid, syscall_name, syscall_invokes);
+        release(&ptable.lock);
+        return 0;
+      }
     }
   }
   release(&ptable.lock);

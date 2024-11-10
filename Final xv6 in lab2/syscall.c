@@ -107,6 +107,7 @@ extern int sys_create_palindrome(void);
 extern int sys_move_file(void);
 extern int sys_sort_syscalls(void);
 extern int sys_list_all_processes(void);
+extern int sys_get_most_invoked_syscall(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -133,7 +134,7 @@ static int (*syscalls[])(void) = {
 [SYS_create_palindrome]   sys_create_palindrome,
 [SYS_move_file]           sys_move_file,
 [SYS_sort_syscalls]       sys_sort_syscalls,
-
+[SYS_get_most_invoked_syscall] sys_get_most_invoked_syscall,
 [SYS_list_all_processes] sys_list_all_processes,
 };
 
@@ -162,7 +163,7 @@ static char *syscall_names[] = {
   [SYS_create_palindrome]         "create_palindrome",
   [SYS_move_file]                 "move_file",
   [SYS_sort_syscalls]             "sort_syscalls",
-
+  [SYS_get_most_invoked_syscall] "get_mosttt_invoked_syscall",
   [SYS_list_all_processes]        "list_all_processes",
 };
 
@@ -174,14 +175,16 @@ syscall(void)
 
   num = curproc->tf->eax;
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
-    curproc->tf->eax = syscalls[num]();
-
     // Track the system call
     if (curproc->syscalls_count < MAX_SYSCALLS) {
       curproc->syscall_num[curproc->syscalls_count] = num;
       curproc->syscall_name[curproc->syscalls_count] = syscall_names[num];
+      curproc->syscall_invokes[num]++;
       curproc->syscalls_count++;
     }
+
+    curproc->tf->eax = syscalls[num]();
+
   } else {
     cprintf("%d %s: unknown sys call %d\n",
             curproc->pid, curproc->name, num);
