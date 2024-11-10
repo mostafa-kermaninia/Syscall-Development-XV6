@@ -7230,6 +7230,11 @@ forkret(void)
 80103921:	89 e5                	mov    %esp,%ebp
 80103923:	56                   	push   %esi
 80103924:	53                   	push   %ebx
+
+static inline uint
+readeflags(void)
+{
+  uint eflags;
   asm volatile("pushfl; popl %0" : "=r" (eflags));
 80103925:	9c                   	pushf  
 80103926:	58                   	pop    %eax
@@ -7268,7 +7273,7 @@ forkret(void)
 8010396d:	e8 0e ca ff ff       	call   80100380 <panic>
     panic("mycpu called with interrupts enabled\n");
 80103972:	83 ec 0c             	sub    $0xc,%esp
-80103975:	68 54 7d 10 80       	push   $0x80107d54
+80103975:	68 50 7d 10 80       	push   $0x80107d50
 8010397a:	e8 01 ca ff ff       	call   80100380 <panic>
 8010397f:	90                   	nop
 
@@ -7608,6 +7613,11 @@ myproc(void) {
   c->proc = 0;
 80103c7a:	8d 78 04             	lea    0x4(%eax),%edi
 80103c7d:	8d 76 00             	lea    0x0(%esi),%esi
+}
+
+static inline void
+sti(void)
+{
   asm volatile("sti");
 80103c80:	fb                   	sti    
     acquire(&ptable.lock);
@@ -8245,7 +8255,7 @@ procdump(void)
     if(p->state >= 0 && p->state < NELEM(states) && states[p->state])
 80104256:	83 f8 05             	cmp    $0x5,%eax
 80104259:	77 11                	ja     8010426c <procdump+0x5c>
-8010425b:	8b 14 85 b8 7d 10 80 	mov    -0x7fef8248(,%eax,4),%edx
+8010425b:	8b 14 85 b4 7d 10 80 	mov    -0x7fef824c(,%eax,4),%edx
       state = "???";
 80104262:	b8 cb 7c 10 80       	mov    $0x80107ccb,%eax
 80104267:	85 d2                	test   %edx,%edx
@@ -8516,109 +8526,103 @@ get_most_invoked_syscall(int pid){
 80104461:	89 e5                	mov    %esp,%ebp
 80104463:	57                   	push   %edi
 80104464:	56                   	push   %esi
+80104465:	53                   	push   %ebx
   char *syscall_name = "";
   int syscall_invokes = 0;
-80104465:	31 f6                	xor    %esi,%esi
+80104466:	31 db                	xor    %ebx,%ebx
 get_most_invoked_syscall(int pid){
-80104467:	53                   	push   %ebx
+80104468:	83 ec 28             	sub    $0x28,%esp
   struct proc *p;
   acquire(&ptable.lock);
-  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-80104468:	bb 54 2d 11 80       	mov    $0x80112d54,%ebx
-get_most_invoked_syscall(int pid){
-8010446d:	83 ec 28             	sub    $0x28,%esp
-80104470:	8b 7d 08             	mov    0x8(%ebp),%edi
-  acquire(&ptable.lock);
-80104473:	68 20 2d 11 80       	push   $0x80112d20
-80104478:	e8 33 04 00 00       	call   801048b0 <acquire>
+8010446b:	68 20 2d 11 80       	push   $0x80112d20
+80104470:	e8 3b 04 00 00       	call   801048b0 <acquire>
   char *syscall_name = "";
-8010447d:	c7 45 e4 08 82 10 80 	movl   $0x80108208,-0x1c(%ebp)
+80104475:	c7 45 e4 08 82 10 80 	movl   $0x80108208,-0x1c(%ebp)
   acquire(&ptable.lock);
-80104484:	83 c4 10             	add    $0x10,%esp
-80104487:	eb 15                	jmp    8010449e <get_most_invoked_syscall+0x3e>
-80104489:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
+8010447c:	83 c4 10             	add    $0x10,%esp
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-80104490:	81 c3 80 03 00 00    	add    $0x380,%ebx
-80104496:	81 fb 54 0d 12 80    	cmp    $0x80120d54,%ebx
-8010449c:	74 72                	je     80104510 <get_most_invoked_syscall+0xb0>
+8010447f:	ba 54 2d 11 80       	mov    $0x80112d54,%edx
+80104484:	eb 18                	jmp    8010449e <get_most_invoked_syscall+0x3e>
+80104486:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
+8010448d:	8d 76 00             	lea    0x0(%esi),%esi
+80104490:	81 c2 80 03 00 00    	add    $0x380,%edx
+80104496:	81 fa 54 0d 12 80    	cmp    $0x80120d54,%edx
+8010449c:	74 6a                	je     80104508 <get_most_invoked_syscall+0xa8>
     if(p->pid == pid){
-8010449e:	39 7b 10             	cmp    %edi,0x10(%ebx)
-801044a1:	75 ed                	jne    80104490 <get_most_invoked_syscall+0x30>
-      cprintf("mew\n");
-801044a3:	83 ec 0c             	sub    $0xc,%esp
-801044a6:	68 07 7d 10 80       	push   $0x80107d07
-801044ab:	e8 f0 c1 ff ff       	call   801006a0 <cprintf>
+8010449e:	8b 72 10             	mov    0x10(%edx),%esi
+801044a1:	3b 75 08             	cmp    0x8(%ebp),%esi
+801044a4:	75 ea                	jne    80104490 <get_most_invoked_syscall+0x30>
       for(int i =0; i< p->syscalls_count;i++){
-801044b0:	8b 53 7c             	mov    0x7c(%ebx),%edx
-801044b3:	83 c4 10             	add    $0x10,%esp
-801044b6:	85 d2                	test   %edx,%edx
-801044b8:	7e d6                	jle    80104490 <get_most_invoked_syscall+0x30>
-801044ba:	8d 83 80 00 00 00    	lea    0x80(%ebx),%eax
-801044c0:	8d 0c 90             	lea    (%eax,%edx,4),%ecx
-801044c3:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
-801044c7:	90                   	nop
+801044a6:	8b 4a 7c             	mov    0x7c(%edx),%ecx
+801044a9:	85 c9                	test   %ecx,%ecx
+801044ab:	7e e3                	jle    80104490 <get_most_invoked_syscall+0x30>
+801044ad:	8d 82 80 00 00 00    	lea    0x80(%edx),%eax
+801044b3:	8d 3c 88             	lea    (%eax,%ecx,4),%edi
+801044b6:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
+801044bd:	8d 76 00             	lea    0x0(%esi),%esi
         if(syscall_invokes < p->syscall_invokes[i]){
-801044c8:	8b 10                	mov    (%eax),%edx
-801044ca:	39 f2                	cmp    %esi,%edx
-801044cc:	7e 0b                	jle    801044d9 <get_most_invoked_syscall+0x79>
+801044c0:	8b 08                	mov    (%eax),%ecx
+801044c2:	39 d9                	cmp    %ebx,%ecx
+801044c4:	7e 0b                	jle    801044d1 <get_most_invoked_syscall+0x71>
             syscall_invokes = p->syscall_invokes[i];
             syscall_name = p->syscall_name[i];
-801044ce:	8b b0 00 02 00 00    	mov    0x200(%eax),%esi
-801044d4:	89 75 e4             	mov    %esi,-0x1c(%ebp)
-801044d7:	89 d6                	mov    %edx,%esi
+801044c6:	8b 98 00 02 00 00    	mov    0x200(%eax),%ebx
+801044cc:	89 5d e4             	mov    %ebx,-0x1c(%ebp)
+801044cf:	89 cb                	mov    %ecx,%ebx
       for(int i =0; i< p->syscalls_count;i++){
-801044d9:	83 c0 04             	add    $0x4,%eax
-801044dc:	39 c8                	cmp    %ecx,%eax
-801044de:	75 e8                	jne    801044c8 <get_most_invoked_syscall+0x68>
+801044d1:	83 c0 04             	add    $0x4,%eax
+801044d4:	39 f8                	cmp    %edi,%eax
+801044d6:	75 e8                	jne    801044c0 <get_most_invoked_syscall+0x60>
         }
       }
       if (syscall_invokes > 0){
-801044e0:	85 f6                	test   %esi,%esi
-801044e2:	7e ac                	jle    80104490 <get_most_invoked_syscall+0x30>
+801044d8:	85 db                	test   %ebx,%ebx
+801044da:	7e b4                	jle    80104490 <get_most_invoked_syscall+0x30>
         cprintf("Most invoked syscall for process %d is %s with %d invokes\n", p->pid, syscall_name, syscall_invokes);
-801044e4:	56                   	push   %esi
-801044e5:	ff 75 e4             	push   -0x1c(%ebp)
-801044e8:	ff 73 10             	push   0x10(%ebx)
-801044eb:	68 7c 7d 10 80       	push   $0x80107d7c
-801044f0:	e8 ab c1 ff ff       	call   801006a0 <cprintf>
+801044dc:	53                   	push   %ebx
+801044dd:	ff 75 e4             	push   -0x1c(%ebp)
+801044e0:	56                   	push   %esi
+801044e1:	68 78 7d 10 80       	push   $0x80107d78
+801044e6:	e8 b5 c1 ff ff       	call   801006a0 <cprintf>
         release(&ptable.lock);
-801044f5:	c7 04 24 20 2d 11 80 	movl   $0x80112d20,(%esp)
-801044fc:	e8 4f 03 00 00       	call   80104850 <release>
+801044eb:	c7 04 24 20 2d 11 80 	movl   $0x80112d20,(%esp)
+801044f2:	e8 59 03 00 00       	call   80104850 <release>
         return 0;
-80104501:	83 c4 10             	add    $0x10,%esp
+801044f7:	83 c4 10             	add    $0x10,%esp
       }
     }
   }
   release(&ptable.lock);
   return -1;
 }
-80104504:	8d 65 f4             	lea    -0xc(%ebp),%esp
+801044fa:	8d 65 f4             	lea    -0xc(%ebp),%esp
         return 0;
-80104507:	31 c0                	xor    %eax,%eax
+801044fd:	31 c0                	xor    %eax,%eax
 }
-80104509:	5b                   	pop    %ebx
-8010450a:	5e                   	pop    %esi
-8010450b:	5f                   	pop    %edi
-8010450c:	5d                   	pop    %ebp
-8010450d:	c3                   	ret    
-8010450e:	66 90                	xchg   %ax,%ax
+801044ff:	5b                   	pop    %ebx
+80104500:	5e                   	pop    %esi
+80104501:	5f                   	pop    %edi
+80104502:	5d                   	pop    %ebp
+80104503:	c3                   	ret    
+80104504:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
   release(&ptable.lock);
-80104510:	83 ec 0c             	sub    $0xc,%esp
-80104513:	68 20 2d 11 80       	push   $0x80112d20
-80104518:	e8 33 03 00 00       	call   80104850 <release>
+80104508:	83 ec 0c             	sub    $0xc,%esp
+8010450b:	68 20 2d 11 80       	push   $0x80112d20
+80104510:	e8 3b 03 00 00       	call   80104850 <release>
   return -1;
-8010451d:	83 c4 10             	add    $0x10,%esp
+80104515:	83 c4 10             	add    $0x10,%esp
 }
-80104520:	8d 65 f4             	lea    -0xc(%ebp),%esp
+80104518:	8d 65 f4             	lea    -0xc(%ebp),%esp
   return -1;
-80104523:	b8 ff ff ff ff       	mov    $0xffffffff,%eax
+8010451b:	b8 ff ff ff ff       	mov    $0xffffffff,%eax
 }
-80104528:	5b                   	pop    %ebx
-80104529:	5e                   	pop    %esi
-8010452a:	5f                   	pop    %edi
-8010452b:	5d                   	pop    %ebp
-8010452c:	c3                   	ret    
-8010452d:	8d 76 00             	lea    0x0(%esi),%esi
+80104520:	5b                   	pop    %ebx
+80104521:	5e                   	pop    %esi
+80104522:	5f                   	pop    %edi
+80104523:	5d                   	pop    %ebp
+80104524:	c3                   	ret    
+80104525:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
+8010452c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
 
 80104530 <list_all_processes>:
 
@@ -8660,7 +8664,7 @@ list_all_processes(){
 80104570:	83 c6 01             	add    $0x1,%esi
         cprintf("Process %d with %d Syscalls\n", p->pid, p->syscalls_count);
 80104573:	ff b3 90 fc ff ff    	push   -0x370(%ebx)
-80104579:	68 0c 7d 10 80       	push   $0x80107d0c
+80104579:	68 07 7d 10 80       	push   $0x80107d07
 8010457e:	e8 1d c1 ff ff       	call   801006a0 <cprintf>
 80104583:	83 c4 10             	add    $0x10,%esp
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
@@ -8699,7 +8703,7 @@ initsleeplock(struct sleeplock *lk, char *name)
 801045b4:	83 ec 0c             	sub    $0xc,%esp
 801045b7:	8b 5d 08             	mov    0x8(%ebp),%ebx
   initlock(&lk->lk, "sleep lock");
-801045ba:	68 d0 7d 10 80       	push   $0x80107dd0
+801045ba:	68 cc 7d 10 80       	push   $0x80107dcc
 801045bf:	8d 43 04             	lea    0x4(%ebx),%eax
 801045c2:	50                   	push   %eax
 801045c3:	e8 18 01 00 00       	call   801046e0 <initlock>
@@ -8956,6 +8960,7 @@ pushcli(void)
 80104761:	89 e5                	mov    %esp,%ebp
 80104763:	53                   	push   %ebx
 80104764:	83 ec 04             	sub    $0x4,%esp
+  asm volatile("pushfl; popl %0" : "=r" (eflags));
 80104767:	9c                   	pushf  
 80104768:	5b                   	pop    %ebx
   asm volatile("cli");
@@ -9028,11 +9033,11 @@ popcli(void)
 801047f1:	c3                   	ret    
     panic("popcli - interruptible");
 801047f2:	83 ec 0c             	sub    $0xc,%esp
-801047f5:	68 db 7d 10 80       	push   $0x80107ddb
+801047f5:	68 d7 7d 10 80       	push   $0x80107dd7
 801047fa:	e8 81 bb ff ff       	call   80100380 <panic>
     panic("popcli");
 801047ff:	83 ec 0c             	sub    $0xc,%esp
-80104802:	68 f2 7d 10 80       	push   $0x80107df2
+80104802:	68 ee 7d 10 80       	push   $0x80107dee
 80104807:	e8 74 bb ff ff       	call   80100380 <panic>
 8010480c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
 
@@ -9093,7 +9098,7 @@ popcli(void)
 80104863:	e8 48 ff ff ff       	call   801047b0 <popcli>
     panic("release");
 80104868:	83 ec 0c             	sub    $0xc,%esp
-8010486b:	68 f9 7d 10 80       	push   $0x80107df9
+8010486b:	68 f5 7d 10 80       	push   $0x80107df5
 80104870:	e8 0b bb ff ff       	call   80100380 <panic>
 80104875:	8d 76 00             	lea    0x0(%esi),%esi
   r = lock->locked && lock->cpu == mycpu();
@@ -9205,7 +9210,7 @@ popcli(void)
 80104958:	e8 53 fe ff ff       	call   801047b0 <popcli>
     panic("acquire");
 8010495d:	83 ec 0c             	sub    $0xc,%esp
-80104960:	68 01 7e 10 80       	push   $0x80107e01
+80104960:	68 fd 7d 10 80       	push   $0x80107dfd
 80104965:	e8 16 ba ff ff       	call   80100380 <panic>
 8010496a:	66 90                	xchg   %ax,%ax
 8010496c:	66 90                	xchg   %ax,%ax
@@ -9980,7 +9985,7 @@ syscall(void)
     cprintf("%d %s: unknown sys call %d\n",
 80104ddc:	50                   	push   %eax
 80104ddd:	ff 73 10             	push   0x10(%ebx)
-80104de0:	68 09 7e 10 80       	push   $0x80107e09
+80104de0:	68 05 7e 10 80       	push   $0x80107e05
 80104de5:	e8 b6 b8 ff ff       	call   801006a0 <cprintf>
     curproc->tf->eax = -1;
 80104dea:	8b 43 18             	mov    0x18(%ebx),%eax
@@ -12098,7 +12103,7 @@ tvinit(void)
 80105de7:	c7 05 c2 0f 12 80 08 	movl   $0xef000008,0x80120fc2
 80105dee:	00 00 ef 
   initlock(&tickslock, "time");
-80105df1:	68 53 7e 10 80       	push   $0x80107e53
+80105df1:	68 4f 7e 10 80       	push   $0x80107e4f
 80105df6:	68 80 0d 12 80       	push   $0x80120d80
   SETGATE(idt[T_SYSCALL], 1, SEG_KCODE<<3, vectors[T_SYSCALL], DPL_USER);
 80105dfb:	66 a3 c0 0f 12 80    	mov    %ax,0x80120fc0

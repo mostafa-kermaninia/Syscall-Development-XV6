@@ -600,7 +600,6 @@ get_most_invoked_syscall(int pid){
   acquire(&ptable.lock);
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     if(p->pid == pid){
-      cprintf("mew\n");
       for(int i =0; i< p->syscalls_count;i++){
         if(syscall_invokes < p->syscall_invokes[i]){
             syscall_invokes = p->syscall_invokes[i];

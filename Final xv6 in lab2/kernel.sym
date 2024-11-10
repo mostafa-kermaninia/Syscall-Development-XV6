@@ -43,7 +43,7 @@
 801037b0 allocproc
 8010b000 first.1
 80120d54 initproc
-80107db8 states.0
+80107db4 states.0
 00000000 sleeplock.c
 00000000 spinlock.c
 00000000 string.c
