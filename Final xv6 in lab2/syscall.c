@@ -130,11 +130,40 @@ static int (*syscalls[])(void) = {
 [SYS_link]    sys_link,
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
-[SYS_create_palindrome] sys_create_palindrome,
-[SYS_move_file] sys_move_file,
-[SYS_sort_syscalls] sys_sort_syscalls,
+[SYS_create_palindrome]   sys_create_palindrome,
+[SYS_move_file]           sys_move_file,
+[SYS_sort_syscalls]       sys_sort_syscalls,
 
 [SYS_list_all_processes] sys_list_all_processes,
+};
+
+static char *syscall_names[] = {
+  [SYS_fork]    "fork",
+  [SYS_exit]    "exit",
+  [SYS_wait]    "wait",
+  [SYS_pipe]    "pipe",
+  [SYS_read]    "read",
+  [SYS_kill]    "kill",
+  [SYS_exec]    "exec",
+  [SYS_fstat]   "fstat",
+  [SYS_chdir]   "chdir",
+  [SYS_dup]     "dup",
+  [SYS_getpid]  "getpid",
+  [SYS_sbrk]    "sbrk",
+  [SYS_sleep]   "sleep",
+  [SYS_uptime]  "uptime",
+  [SYS_open]    "open",
+  [SYS_write]   "write",
+  [SYS_mknod]   "mknod",
+  [SYS_unlink]  "unlink",
+  [SYS_link]    "link",
+  [SYS_mkdir]   "mkdir",
+  [SYS_close]   "close",
+  [SYS_create_palindrome]         "create_palindrome",
+  [SYS_move_file]                 "move_file",
+  [SYS_sort_syscalls]             "sort_syscalls",
+
+  [SYS_list_all_processes]        "list_all_processes",
 };
 
 void
@@ -148,7 +177,11 @@ syscall(void)
     curproc->tf->eax = syscalls[num]();
 
     // Track the system call
-    curproc->syscalls[num - 1]++;
+    if (curproc->syscalls_count < MAX_SYSCALLS) {
+      curproc->syscall_num[curproc->syscalls_count] = num;
+      curproc->syscall_name[curproc->syscalls_count] = syscall_names[num];
+      curproc->syscalls_count++;
+    }
   } else {
     cprintf("%d %s: unknown sys call %d\n",
             curproc->pid, curproc->name, num);

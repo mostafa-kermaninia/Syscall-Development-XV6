@@ -34,7 +34,7 @@ struct context {
 
 enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
-#define MAX_SYSCALLS 32  // Maximum number of distinct system calls to track
+#define MAX_SYSCALLS 64  // Maximum number of distinct system calls to track
 
 // Per-process state
 struct proc {
@@ -51,7 +51,9 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
-  int syscalls[MAX_SYSCALLS];   // Array to count each system call
+  int syscalls_count;                 // count number of system calls
+  int syscall_num[MAX_SYSCALLS];      // system calls number
+  char *syscall_name[MAX_SYSCALLS];   // system calls name
 };
 
 // Process memory is laid out contiguously, low addresses first:

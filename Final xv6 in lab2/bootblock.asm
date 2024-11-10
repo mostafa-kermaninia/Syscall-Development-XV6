@@ -11,7 +11,7 @@ Disassembly of section .text:
 .globl start
 start:
   cli                         # BIOS enabled interrupts; disable
-    7c00:	fa                   	cli    
+    7c00:	fa                   	cli
 
   # Zero data segment registers DS, ES, and SS.
   xorw    %ax,%ax             # Set %ax to zero
@@ -123,13 +123,13 @@ spin:
 
 00007c60 <gdt>:
 	...
-    7c68:	ff                   	(bad)  
+    7c68:	ff                   	(bad)
     7c69:	ff 00                	incl   (%eax)
     7c6b:	00 00                	add    %al,(%eax)
     7c6d:	9a cf 00 ff ff 00 00 	lcall  $0x0,$0xffff00cf
-    7c74:	00                   	.byte 0x0
+    7c74:	00                   	.byte 0
     7c75:	92                   	xchg   %eax,%edx
-    7c76:	cf                   	iret   
+    7c76:	cf                   	iret
 	...
 
 00007c78 <gdtdesc>:
@@ -157,7 +157,7 @@ waitdisk(void)
     7c89:	75 f8                	jne    7c83 <waitdisk+0x5>
     ;
 }
-    7c8b:	c3                   	ret    
+    7c8b:	c3                   	ret
 
 00007c8c <readsect>:
 
@@ -215,14 +215,14 @@ outb(ushort port, uchar data)
     7ce0:	8b 7d 08             	mov    0x8(%ebp),%edi
     7ce3:	b9 80 00 00 00       	mov    $0x80,%ecx
     7ce8:	ba f0 01 00 00       	mov    $0x1f0,%edx
-    7ced:	fc                   	cld    
+    7ced:	fc                   	cld
     7cee:	f3 6d                	rep insl (%dx),%es:(%edi)
   insl(0x1F0, dst, SECTSIZE/4);
 }
     7cf0:	5b                   	pop    %ebx
     7cf1:	5f                   	pop    %edi
     7cf2:	5d                   	pop    %ebp
-    7cf3:	c3                   	ret    
+    7cf3:	c3                   	ret
 
 00007cf4 <readseg>:
 
@@ -260,8 +260,8 @@ readseg(uchar* pa, uint count, uint offset)
   // We'd write more to memory than asked, but it doesn't matter --
   // we load in increasing order.
   for(; pa < epa; pa += SECTSIZE, offset++)
-    7d17:	39 df                	cmp    %ebx,%edi
-    7d19:	76 1a                	jbe    7d35 <readseg+0x41>
+    7d17:	39 fb                	cmp    %edi,%ebx
+    7d19:	73 1a                	jae    7d35 <readseg+0x41>
     readsect(pa, offset);
     7d1b:	83 ec 08             	sub    $0x8,%esp
     7d1e:	56                   	push   %esi
@@ -271,15 +271,15 @@ readseg(uchar* pa, uint count, uint offset)
     7d25:	81 c3 00 02 00 00    	add    $0x200,%ebx
     7d2b:	83 c6 01             	add    $0x1,%esi
     7d2e:	83 c4 10             	add    $0x10,%esp
-    7d31:	39 df                	cmp    %ebx,%edi
-    7d33:	77 e6                	ja     7d1b <readseg+0x27>
+    7d31:	39 fb                	cmp    %edi,%ebx
+    7d33:	72 e6                	jb     7d1b <readseg+0x27>
 }
     7d35:	8d 65 f4             	lea    -0xc(%ebp),%esp
     7d38:	5b                   	pop    %ebx
     7d39:	5e                   	pop    %esi
     7d3a:	5f                   	pop    %edi
     7d3b:	5d                   	pop    %ebp
-    7d3c:	c3                   	ret    
+    7d3c:	c3                   	ret
 
 00007d3d <bootmain>:
 {
@@ -317,11 +317,11 @@ readseg(uchar* pa, uint count, uint offset)
     7d8b:	5e                   	pop    %esi
     7d8c:	5f                   	pop    %edi
     7d8d:	5d                   	pop    %ebp
-    7d8e:	c3                   	ret    
+    7d8e:	c3                   	ret
   for(; ph < eph; ph++){
     7d8f:	83 c3 20             	add    $0x20,%ebx
-    7d92:	39 de                	cmp    %ebx,%esi
-    7d94:	76 eb                	jbe    7d81 <bootmain+0x44>
+    7d92:	39 f3                	cmp    %esi,%ebx
+    7d94:	73 eb                	jae    7d81 <bootmain+0x44>
     pa = (uchar*)ph->paddr;
     7d96:	8b 7b 0c             	mov    0xc(%ebx),%edi
     readseg(pa, ph->filesz, ph->off);
@@ -334,8 +334,8 @@ readseg(uchar* pa, uint count, uint offset)
     7da8:	8b 4b 14             	mov    0x14(%ebx),%ecx
     7dab:	8b 43 10             	mov    0x10(%ebx),%eax
     7dae:	83 c4 10             	add    $0x10,%esp
-    7db1:	39 c1                	cmp    %eax,%ecx
-    7db3:	76 da                	jbe    7d8f <bootmain+0x52>
+    7db1:	39 c8                	cmp    %ecx,%eax
+    7db3:	73 da                	jae    7d8f <bootmain+0x52>
       stosb(pa + ph->filesz, 0, ph->memsz - ph->filesz);
     7db5:	01 c7                	add    %eax,%edi
     7db7:	29 c1                	sub    %eax,%ecx
@@ -346,7 +346,7 @@ stosb(void *addr, int data, int cnt)
 {
   asm volatile("cld; rep stosb" :
     7db9:	b8 00 00 00 00       	mov    $0x0,%eax
-    7dbe:	fc                   	cld    
+    7dbe:	fc                   	cld
     7dbf:	f3 aa                	rep stos %al,%es:(%edi)
                "=D" (addr), "=c" (cnt) :
                "0" (addr), "1" (cnt), "a" (data) :

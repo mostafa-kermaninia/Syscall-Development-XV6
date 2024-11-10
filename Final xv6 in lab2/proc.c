@@ -112,8 +112,8 @@ found:
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
 
-  // Initialize number of each system call
-  memset(p->syscalls, 0, sizeof(p->syscalls));
+  // Initialize number of system calls
+  p->syscalls_count = 0;
 
   return p;
 }
@@ -550,17 +550,37 @@ create_palindrome(int num){
 int
 sort_syscalls(int pid)
 {
-  int i;
+  int i, j, tmp_num, last_one = 0;
+  char *tmp_name;
   struct proc *p;
 
   // Find the process with the given PID
   acquire(&ptable.lock);
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     if(p->pid == pid){
+      // Sort system calls
+      for(i = 0; i < p->syscalls_count-1; i++){
+        for(j = 0; j < p->syscalls_count-i-1; j++){
+          if(p->syscall_num[j] > p->syscall_num[j+1]){
+            tmp_num = p->syscall_num[j];
+            tmp_name = p->syscall_name[j];
+            
+            p->syscall_num[j] = p->syscall_num[j+1];
+            p->syscall_name[j] = p->syscall_name[j+1];
+
+            p->syscall_num[j+1] = tmp_num;
+            p->syscall_name[j+1] = tmp_name;
+          }
+        }
+      }
+
       cprintf("System calls for process %d:\n", pid);
-      for(i = 0; i < MAX_SYSCALLS; i++)
-        if(p->syscalls[i] > 0)
-          cprintf("Syscall #%d: %d\n", i + 1, p->syscalls[i]);
+      for(i = 0; i < p->syscalls_count-1; i++)
+        if(p->syscall_num[i] != last_one){
+          cprintf("Syscall #%d: %s\n", p->syscall_num[i], p->syscall_name[i]);
+          last_one = p->syscall_num[i];
+        }
+
       release(&ptable.lock);
       return 0;
     }
@@ -571,19 +591,14 @@ sort_syscalls(int pid)
 
 int
 list_all_processes(){
-  int i, p_count = 0;
+  int p_count = 0;
   struct proc *p;
 
   acquire(&ptable.lock);
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     if (p->state == RUNNING){
         p_count++;
-        int num_syscalls = 0;
-        for(i = 0; i < MAX_SYSCALLS; i++)
-          // num_syscalls += p->syscalls[i];
-          if(p->syscalls[i] > 0)
-            num_syscalls += p->syscalls[i];
-        cprintf("Process %d with %d Syscalls\n", p->pid, num_syscalls);
+        cprintf("Process %d with %d Syscalls\n", p->pid, p->syscalls_count);
       }
     }
   release(&ptable.lock);

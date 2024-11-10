@@ -11,7 +11,7 @@ Disassembly of section .text:
 .globl start
 start:
   cli            
-    7000:	fa                   	cli    
+    7000:	fa                   	cli
 
   # Zero data segment registers DS, ES, and SS.
   xorw    %ax,%ax
@@ -110,13 +110,13 @@ spin:
 
 0000706c <gdt>:
 	...
-    7074:	ff                   	(bad)  
+    7074:	ff                   	(bad)
     7075:	ff 00                	incl   (%eax)
     7077:	00 00                	add    %al,(%eax)
     7079:	9a cf 00 ff ff 00 00 	lcall  $0x0,$0xffff00cf
-    7080:	00                   	.byte 0x0
+    7080:	00                   	.byte 0
     7081:	92                   	xchg   %eax,%edx
-    7082:	cf                   	iret   
+    7082:	cf                   	iret
 	...
 
 00007084 <gdtdesc>:

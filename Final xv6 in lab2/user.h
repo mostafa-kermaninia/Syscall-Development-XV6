@@ -23,7 +23,7 @@ int getpid(void);
 char *sbrk(int);
 int sleep(int);
 int uptime(void);
-void create_palindrome();
+void create_palindrome(void);
 int move_file(const char *, const char *);
 int sort_syscalls(int);
 int list_all_processes(void);

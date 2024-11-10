@@ -33,7 +33,7 @@ exit:
   1a:	eb f7                	jmp    13 <exit>
 
 0000001c <init>:
-  1c:	2f                   	das    
+  1c:	2f                   	das
   1d:	69 6e 69 74 00 00 90 	imul   $0x90000074,0x69(%esi),%ebp
 
 00000024 <argv>:
